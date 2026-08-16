@@ -1,67 +1,163 @@
+/**
+ * Estilos globales de la LANDING.
+ *
+ * OJO: /tutela y /peticion son páginas que se IMPRIMEN a PDF con Chromium, y
+ * heredan este archivo. Sus hojas propias (tutela.css, peticion.css) fuerzan
+ * serifa, fondo blanco y márgenes de oficio, así que lo de aquí no las afecta —
+ * pero cualquier regla que se agregue sobre `html`, `body` o `*` hay que
+ * probarla regenerando un PDF antes de darla por buena.
+ */
 @import "tailwindcss";
 
-:root {
-  /* Marca Mijo. Verde institucional, sobrio: esto acompaña a alguien
-     enfermo en un trámite judicial, no vende nada. */
-  --azul: #1a5c2e;
-  --azul-dark: #124220;
-  --verde: #1a9e5c;
-  --rojo: #d64545;
-  --grafito: #575756;
-  --bg: #f5f6f4;
-  --card-border: #e4e7e3;
+@theme {
+  /* Superficies */
+  --color-canvas: #f5f6f4;
+  --color-surface: #ffffff;
+  --color-line: #e4e7e3;
+  --color-line-dashed: #c9cfc8;
+
+  /* Texto */
+  --color-ink: #2c2f31;
+  --color-muted: #575756;
+  --color-faint: #9aa09a;
+
+  /* Verdes de marca */
+  --color-brand: #1a5c2e;
+  --color-brand-deep: #124220;
+  --color-brand-bright: #1a9e5c;
+  --color-bubble: #d7f0dd;
+
+  /* Secciones oscuras */
+  --color-night: #101a14;
+  --color-night-text: #e7ece7;
+  --color-night-muted: #b8c2ba;
+  --color-night-soft: #8b968d;
+  --color-night-faint: #6f7d72;
+
+  /* Señales */
+  --color-danger: #d64545;
+  --color-gold: #b8860b;
+
+  --font-sans: var(--font-figtree), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Punto en el que se activan los grids a dos columnas y el pinning por scroll */
+  --breakpoint-pin: 1000px;
 }
 
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body {
-  font-family: var(--font-figtree), "Figtree", system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  background: var(--bg);
-  color: #2c2f31;
-}
-a { color: var(--azul); text-decoration: none; }
-a:hover { color: var(--azul-dark); }
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.55;
+    overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* El header pegajoso mide 68px: los anclajes no deben quedar debajo. */
+  [id] {
+    scroll-margin-top: 84px;
+  }
+
+  a {
+    color: var(--color-brand);
+    text-decoration: none;
+  }
+
+  ::selection {
+    background: var(--color-bubble);
+    color: var(--color-brand-deep);
+  }
+}
+
+@layer components {
+  /* Etiqueta de sección: versalitas verdes sobre claro, brillantes sobre oscuro. */
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-brand);
+  }
+
+  .eyebrow-night {
+    color: var(--color-brand-bright);
+  }
+}
+
+@layer utilities {
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* El hilo del chat se desplaza, pero sin barra a la vista. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Las burbujas se montan una a una, así que la entrada es una animación, no una
+   transición: el elemento no existe en el DOM hasta que le toca. */
+@keyframes mj-bubble {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.bubble-in {
+  animation: mj-bubble 0.25s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+
+@keyframes mj-dot {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── Scrollbar (del resto de la app) ─────────────────────────────────── */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb {
   background: #d3d7db; border-radius: 6px;
   border: 2px solid transparent; background-clip: content-box;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  @keyframes latido { 0%, 100% { opacity: 1; transform: none; } }
-}
-
-/* ── Portada ──────────────────────────────────────────────────────────── */
-.portada {
-  max-width: 40rem;
-  margin: 0 auto;
-  padding: 4rem 1.5rem;
-  line-height: 1.6;
-}
-.portada h1 {
-  font-size: 2.6rem;
-  font-weight: 900;
-  color: var(--azul);
-  margin: 0 0 .75rem;
-  letter-spacing: -0.02em;
-}
-.portada__claim { font-size: 1.15rem; margin: 0 0 2rem; }
-.portada__datos {
-  list-style: none;
-  margin: 0 0 2rem;
-  padding: 1rem 1.25rem;
-  background: #fff;
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-}
-.portada__datos li { padding: .3rem 0; }
-.portada__datos b { color: var(--azul); font-variant-numeric: tabular-nums; }
-.portada__nota {
-  padding: 1rem 1.25rem;
-  border-left: 3px solid var(--azul);
-  background: #fff;
-  margin: 0 0 2rem;
-}
-.portada__pie { font-size: .9rem; color: #6b7075; }
