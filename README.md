@@ -26,7 +26,10 @@ flowchart TD
     E --> F["🧠 Motor de reglas<br/>lib/ml.ts<br/><i>¿qué falta preguntar?</i>"]
     F -->|falta info| G["pregunta SOLO lo que falta"]
     G --> A
-    F -->|procedente| H
+    F -->|procedente| T{"⚖️ TRIAJE<br/>lib/prompts/triaje.ts"}
+    T -->|"nunca pidió<br/>y sin urgencia"| DP["📝 DERECHO DE PETICIÓN<br/>15 días hábiles<br/><i>si no responden → tutela</i>"]
+    T -->|"ya pidió, o<br/>urgencia vital"| H
+    DP --> Q
 
     subgraph IA["Cadena jurídica · lib/armarTutela.ts"]
         H["1 · CLASIFICAR<br/>¿qué derecho? ¿es de salud?"] --> I["2 · ESTRUCTURAR<br/>relato → hechos numerados"]
@@ -44,10 +47,17 @@ flowchart TD
     O --> P
     P --> Q["entrega en orden:<br/>1 PDF · 2 nota de voz · 3 estadística"]
     Q --> A
+    Q --> R["📮 radicación por correo<br/><i>solo con consentimiento</i>"]
+    R --> SEG["⏰ seguimiento a 10 días<br/>→ desacato art. 52"]
+    A2["☎️ Sin WhatsApp:<br/>llama y conversa"] --> F
+    Q -.->|"«llámame»"| A3["📞 lee la tutela<br/>en voz alta"]
 
     style L fill:#1a5c2e,color:#fff
     style N fill:#8b2020,color:#fff
     style O fill:#1a5c2e,color:#fff
+    style T fill:#1f4d7a,color:#fff
+    style DP fill:#1f4d7a,color:#fff
+    style A2 fill:#5c3a1a,color:#fff
 ```
 
 **La regla que ordena todo el diseño: el modelo emite juicios, el código emite hechos.**
@@ -62,8 +72,9 @@ Modelo: **Gemini 2.5 Flash** (`gemini-2.5-flash`) para todo lo generativo, **gem
 | # | Qué decide | Archivo | Si falla |
 |---|---|---|---|
 | 1 | **Clasificar** — qué derecho fundamental está en juego, si el caso es de salud, si hay riesgo que amerite medida provisional | [`lib/prompts/clasificar.ts`](web/lib/prompts/clasificar.ts) | Se asume salud y se sigue: el flujo entero ya está acotado a negativas de EPS |
-| 2 | **Estructurar** — convierte el desahogo en hechos numerados en orden cronológico procesal. Es reescritura con criterio jurídico, no formateo | [`lib/prompts/estructurar.ts`](web/lib/prompts/estructurar.ts) | **Único paso sin el que no hay documento.** Se avisa y se pide reintentar |
-| 3 | **Redactar** — los fundamentos de derecho, citando *solo* los pasajes recuperados | [`lib/prompts/redactar.ts`](web/lib/prompts/redactar.ts) | El escrito sale con los fundamentos de ley y sin citas. Sigue siendo radicable: el art. 14 del Decreto 2591 dice que no es indispensable citar la norma infringida |
+| 2 | **Triar** — ¿tutela o derecho de petición? Depende de si ya pidió formalmente y de si hay urgencia vital | [`lib/prompts/triaje.ts`](web/lib/prompts/triaje.ts) | Cae del lado de la tutela: es la vía que nunca deja a alguien sin protección |
+| 3 | **Estructurar** — convierte el desahogo en hechos numerados en orden cronológico procesal. Es reescritura con criterio jurídico, no formateo | [`lib/prompts/estructurar.ts`](web/lib/prompts/estructurar.ts) | **Único paso sin el que no hay documento.** Se avisa y se pide reintentar |
+| 4 | **Redactar** — los fundamentos de derecho, citando *solo* los pasajes recuperados | [`lib/prompts/redactar.ts`](web/lib/prompts/redactar.ts) | El escrito sale con los fundamentos de ley y sin citas. Sigue siendo radicable: el art. 14 del Decreto 2591 dice que no es indispensable citar la norma infringida |
 | — | **Conversar** — extrae varios campos por turno y responde dudas de paso | [`lib/conversacion.ts`](web/lib/conversacion.ts) | Cae a reglas y regex; el bot sigue andando con lenguaje menos flexible |
 | — | **Recuperar** — encuentra la sentencia cuyo *supuesto de hecho* se parece | [`lib/jurisprudencia.ts`](web/lib/jurisprudencia.ts) | Sin embeddings queda solo BM25; con menos analogía pero funciona |
 
@@ -73,6 +84,9 @@ Modelo: **Gemini 2.5 Flash** (`gemini-2.5-flash`) para todo lo generativo, **gem
 - **Si una fecha la dijo la persona** → `fechaSoloSiLaDijo()` en [`lib/prompts/estructurar.ts`](web/lib/prompts/estructurar.ts)
 - **Si la tutela es procedente** → motor de reglas en [`lib/ml.ts`](web/lib/ml.ts), con el fundamento normativo de cada requisito
 - **La estadística de casos análogos** → se cuenta sobre el corpus, no se estima
+- **Los plazos legales** → `plazoPeticion()` en [`lib/prompts/triaje.ts`](web/lib/prompts/triaje.ts), con el artículo al lado. Un plazo mal puesto hace que alguien deje vencer su derecho
+- **Si hay urgencia vital** → `hayUrgenciaVital()`: si el modelo propone petición donde hay diálisis o quimio, el código fuerza tutela. Solo sube, nunca baja
+- **Si un "sí" es un "sí"** → se normaliza antes de comparar: `\b` no cierra límite junto a una vocal acentuada y "sí" nunca matcheaba
 
 ### Sobre el "cerebro": reglas, no un modelo entrenado
 
@@ -171,9 +185,10 @@ Con Supabase, el audio y el PDF salen de un bucket público con URL estable.
 
 ```bash
 # 1. En el dashboard → SQL Editor, correr en orden:
-#    web/supabase/migrations/0001_init.sql   (tablas)
-#    web/supabase/migrations/0002_storage.sql            (bucket audios)
-#    web/supabase/migrations/0007_storage_documentos.sql (bucket documentos)
+#    web/supabase/migrations/0001_init.sql            (tabla casos)
+#    web/supabase/migrations/0002_bucket_audios.sql   (notas de voz)
+#    web/supabase/migrations/0003_bucket_documentos.sql (los PDF)
+#    web/supabase/migrations/0004_seguimientos.sql    (recordatorios a 10 días)
 # 2. Pegar las llaves en .env.local y activar:
 node scripts/activar-supabase.mjs
 ```
@@ -206,6 +221,38 @@ Gemini y ElevenLabs. Verificado en ambos sentidos: firma legítima → 200, forj
 **Corre en local con ngrok, y es a propósito.** El sandbox de WhatsApp de Twilio solo entrega mensajes a números que hicieron `join`, así que una URL pública no aporta nada para la demo: el cuello de botella es el sandbox, no el hosting.
 
 La ruta a producción es WhatsApp Business API con número propio, y despliegue en **un proceso Node persistente** (Railway, Render, Fly). **No serverless**, por dos razones concretas de este código: el estado de la sesión vive en memoria (`globalThis`), y la entrega es asíncrona *después* de responder el webhook — una función que se congela al devolver la respuesta cortaría el envío del PDF y de la nota de voz a la mitad.
+
+---
+
+## Derecho de petición: a veces la tutela no es la vía
+
+Mandar a todo el mundo directo a la tutela sería más vistoso y peor consejo.
+
+Si la persona **nunca le pidió nada formalmente** a su EPS y no hay urgencia vital, lo que corresponde es un **derecho de petición** (art. 23 C.P., Ley 1755 de 2015): es más rápido, muchas veces resuelve solo, y si no resuelve deja justo lo que la tutela necesita — la prueba de que se pidió y no contestaron. El bot lo dice sin rodeos:
+
+> *"Antes de la tutela te sirve más un derecho de petición… Es gratis, no necesitas juez, y tu EPS está obligada a responderte por escrito. Tienen **15 días hábiles**. Si no te responden, ahí sí armamos la tutela — y llegas con la prueba de que pediste primero."*
+
+**El código le gana al modelo en un solo sentido.** Si el relato menciona diálisis, quimioterapia, oxígeno domiciliario o un trasplante, el triaje fuerza tutela aunque el modelo haya propuesto petición. **Nunca al revés.** Mandar a esperar 15 días hábiles a alguien en diálisis es exactamente el daño que la tutela existe para evitar.
+
+### Los plazos los pone el código, no el modelo
+
+| Modalidad | Término | Norma |
+|---|---|---|
+| Regla general | 15 días hábiles | Art. 14, inciso 1 |
+| Documentos e información | 10 días hábiles | Art. 14, num. 1 |
+| Consultas | 30 días hábiles | Art. 14, num. 2 |
+| Prórroga excepcional | máx. el doble, avisando antes | Art. 14, parágrafo |
+
+Verificados contra el [texto oficial de la Ley 1755](https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65334). Un plazo mal puesto hace que alguien deje vencer su derecho, así que no se le pregunta a un modelo: es una función.
+
+Dos detalles que valen oro y salieron de leer la ley completa:
+
+- **Art. 14 num. 1:** vencidos los 10 días sin respuesta, la petición de documentos **se entiende aceptada** para todos los efectos legales. El silencio le da la razón a la persona.
+- **Art. 33:** a las entidades del Sistema de Seguridad Social **se les aplican** las reglas del derecho de petición en su relación con los usuarios. Es el enganche exacto para que una EPS privada no alegue que es un particular. Va citado en el PDF.
+
+**Los días son hábiles** por el art. 62 de la Ley 4 de 1913, y los festivos **se calculan** (Pascua + Ley Emiliani), no se listan: una tabla escrita a mano se vence en enero y nadie se entera hasta que un plazo sale mal. Verificado contra el calendario oficial 2026: 18 de 18.
+
+Al enviarla se agenda el seguimiento con **su** plazo —no con los 10 días de la tutela— y al vencerse el bot vuelve a escribir.
 
 ---
 
