@@ -218,6 +218,21 @@ cualquiera que dé con la URL puede forjar mensajes entrantes y gastar la cuota 
 Gemini y ElevenLabs. Verificado en ambos sentidos: firma legítima → 200, forjada
 → 403.
 
+### La landing sí va en Vercel. El bot no.
+
+| | Dónde | Por qué |
+|---|---|---|
+| **Landing** (`/`) | Vercel | Es una página. Root Directory: `web`. Solo necesita `NEXT_PUBLIC_WHATSAPP_NUMBER` y `NEXT_PUBLIC_PHONE_NUMBER` |
+| **Bot** (webhook, PDF, voz) | Railway / Render / Fly | Ver abajo |
+
+El bot **desplegaría sin errores en Vercel y se rompería en runtime**, que es peor que fallar al desplegar: parece que anda. Tres razones de este código concreto:
+
+1. **La entrega es asíncrona.** El webhook responde al instante y *después* manda el PDF, la nota de voz y la estadística. Una función serverless se congela al devolver la respuesta: esos tres mensajes nunca saldrían.
+2. **El estado vive en memoria.** Las sesiones están en `globalThis`; cada invocación puede caer en otra instancia y el bot saludaría de nuevo en cada mensaje.
+3. **Chromium no cabe.** Playwright supera el límite de tamaño de una función, así que el PDF no se generaría.
+
+No subas las claves del bot (`GEMINI_API_KEY`, `TWILIO_*`, `RESEND_API_KEY`, Supabase) al proyecto de la landing: no las usa, y son superficie de ataque gratis.
+
 **Corre en local con ngrok, y es a propósito.** El sandbox de WhatsApp de Twilio solo entrega mensajes a números que hicieron `join`, así que una URL pública no aporta nada para la demo: el cuello de botella es el sandbox, no el hosting.
 
 La ruta a producción es WhatsApp Business API con número propio, y despliegue en **un proceso Node persistente** (Railway, Render, Fly). **No serverless**, por dos razones concretas de este código: el estado de la sesión vive en memoria (`globalThis`), y la entrega es asíncrona *después* de responder el webhook — una función que se congela al devolver la respuesta cortaría el envío del PDF y de la nota de voz a la mitad.
