@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { interpretarSiNo } from "@/lib/afirmaciones";
 import { armarTutela, fraseEstadistica } from "@/lib/armarTutela";
 import { correoDisponible, enviarTutelaAlUsuario, radicarPorCorreo, resolverReparto } from "@/lib/correo";
 import {
@@ -406,12 +407,26 @@ async function computarRespuesta(
    * pregunta aparte y explícita, y el "no" es tan válido como el "sí". */
   if (sesion.fase === "espera_radicacion") {
     const r = sesion.radicacion;
-    const dijoSi = /\b(s[ií]|dale|listo|hazlo|h[aá]galo|claro|por favor|dele|dele pues|dele que s[ií]|dsi|dl)\b/i.test(body)
-      && !/\bno\b/i.test(body);
+    /* Reglas primero, Gemini para desempatar (ver lib/afirmaciones.ts). La lista
+     * blanca de confirmaciones cortas leía "Radícala por mí ante la oficina de
+     * Medellín" —el consentimiento más explícito posible— como un no. */
+    const intencion = await interpretarSiNo(
+      body,
+      `¿Quieres que radique tu tutela ante la Oficina Judicial de Reparto de ${r?.ciudad ?? "tu ciudad"}?`,
+    );
+
+    /* Ambiguo NO es un no: se repregunta y se conserva la sesión. Decidir en
+     * silencio sobre un acto irreversible es peor que preguntar dos veces. */
+    if (intencion === "ambiguo") {
+      return spec(
+        "Perdón, no te entendí bien. ¿Quieres que yo la radique por ti ante el juzgado? "
+        + "Respóndeme *sí* o *no* — si prefieres llevarla tú, también está perfecto.",
+      );
+    }
 
     sesiones.set(from, { ...sesion, fase: "entregada", radicacion: undefined });
 
-    if (!dijoSi) {
+    if (intencion === "no") {
       return spec(
         "Listo, no la radico. El PDF ya es tuyo: la puedes llevar a cualquier juzgado "
         + "o subirla al portal cuando quieras. En el correo te dejé el paso a paso.",

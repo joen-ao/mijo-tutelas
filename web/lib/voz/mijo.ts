@@ -21,6 +21,7 @@
  * teléfono probablemente no lo tiene. Si no logra dar un correo, igual se le
  * lee qué hacer y el documento queda guardado.
  */
+import { interpretarSiNo } from "@/lib/afirmaciones";
 import { armarTutela } from "@/lib/armarTutela";
 import { extraerCampos } from "@/lib/conversacion";
 import { correoDisponible, enviarTutelaAlUsuario, resolverReparto } from "@/lib/correo";
@@ -207,29 +208,6 @@ function deletrear(correo: string): string {
   return `${local.split("").join(", ")}, arroba, ${dominio.replace(/\./g, " punto ")}`;
 }
 
-/* Sí y no, dichos como los dice la gente por teléfono.
- *
- * OJO con \b y las tildes: en "sí" el límite final tendría que caer después de
- * "í", que en regex ASCII no es carácter de palabra, así que \bsí\b NO matchea
- * nunca — y Twilio transcribe CON tilde. Por eso se normaliza primero y recién
- * después se compara. Esta trampa ya estaba documentada en lib/mensajes.ts del
- * proyecto anterior y la volví a pisar.
- */
-function normalizar(t: string): string {
-  return t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-}
-
-export function esAfirmativo(t: string): boolean {
-  const n = normalizar(t);
-  if (/\bno\b/.test(n)) return false;   // "no, esta mal" gana sobre "esta"
-  return /(^|\s)(si|sii|claro|correcto|exacto|exactamente|asi es|esta bien|estabien|listo|dale|perfecto|de una|afirmativo|ok|okey|obvio|ya)(\s|$|,|\.)/.test(n);
-}
-
-export function esNegativo(t: string): boolean {
-  const n = normalizar(t);
-  return /(^|\s)(no|nop|negativo|esta mal|mal|equivocado|incorrecto|otra vez|repita|repitame)(\s|$|,|\.)/.test(n);
-}
-
 /** Un turno: la persona habló, respondemos. */
 export async function turnoDeVoz(callSid: string, dicho: string): Promise<RespuestaVoz> {
   const s = sesiones.get(callSid);
@@ -247,12 +225,15 @@ export async function turnoDeVoz(callSid: string, dicho: string): Promise<Respue
   /* Confirmación del correo: es el único dato que se lee de vuelta, porque es el
    * único que si sale mal deja a la persona sin documento. */
   if (s.correoTentativo) {
-    if (esAfirmativo(dicho)) {
+    /* 3 s de tope: esto corre dentro de un turno de llamada y Twilio corta a
+     * los 15. Si no alcanza, cae a "ambiguo" y se repregunta. */
+    const intencion = await interpretarSiNo(dicho, "¿El correo quedó bien?", { msMax: 3000 });
+    if (intencion === "si") {
       const correo = s.correoTentativo;
       s.correoTentativo = null;
       return cerrar(callSid, s, correo);
     }
-    if (esNegativo(dicho)) {
+    if (intencion === "no") {
       s.correoTentativo = null;
       return vocalizar(
         "Está bien, deletréemelo otra vez. Cuando termine, oprima la tecla numeral.",
