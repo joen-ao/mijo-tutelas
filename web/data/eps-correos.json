@@ -1,0 +1,60 @@
+{
+  "_fuente": {
+    "consultado": "2026-08-16",
+    "_nota_verificado": "verificado=true SOLO si la dirección se leyó en el sitio oficial de la propia EPS (página de PQRS o de notificaciones judiciales) y se transcribió tal cual. verificado=false = se observó en fuentes secundarias pero NO se confirmó contra el sitio oficial. lib/correoPeticion.ts se NIEGA a enviar a una dirección con verificado=false cuando no hay override de pruebas: mandarle el derecho de petición de alguien a un buzón equivocado es peor que no mandarlo, porque la persona cree que radicó y el término nunca empieza a correr.",
+    "_nota_correo_null": "correo=null significa que no tenemos buzón para esa EPS. NO es un error: el flujo le dice a la persona que radique ella misma en la oficina de atención al usuario, que siempre funciona y le deja el sello de recibido en la mano.",
+    "_alternativa_siempre_valida": "Radicar en persona en cualquier oficina de atención al usuario. El parágrafo 3 del artículo 32 de la Ley 1755 de 2015 prohíbe a las entidades privadas negarse a recibir y radicar peticiones respetuosas.",
+    "_pendiente": "Confirmar cada dirección contra el sitio oficial de la EPS antes de habilitar el envío en producción. Ninguna está confirmada todavía."
+  },
+
+  "nueva eps": {
+    "nombre": "Nueva EPS S.A.",
+    "correo": "secretaria.general@nuevaeps.com.co",
+    "verificado": false
+  },
+  "sanitas": {
+    "nombre": "EPS Sanitas S.A.S.",
+    "correo": null,
+    "verificado": false
+  },
+  "sura": {
+    "nombre": "EPS y Medicina Prepagada Suramericana S.A.",
+    "correo": null,
+    "verificado": false
+  },
+  "salud total": {
+    "nombre": "Salud Total EPS-S S.A.",
+    "correo": null,
+    "verificado": false
+  },
+  "compensar": {
+    "nombre": "Compensar EPS",
+    "correo": null,
+    "verificado": false
+  },
+  "famisanar": {
+    "nombre": "Famisanar EPS S.A.S.",
+    "correo": null,
+    "verificado": false
+  },
+  "coosalud": {
+    "nombre": "Coosalud EPS S.A.",
+    "correo": null,
+    "verificado": false
+  },
+  "mutual ser": {
+    "nombre": "Mutual SER EPS",
+    "correo": null,
+    "verificado": false
+  },
+  "salud mia": {
+    "nombre": "Salud Mía EPS",
+    "correo": null,
+    "verificado": false
+  },
+  "asmet salud": {
+    "nombre": "Asmet Salud EPS S.A.S.",
+    "correo": null,
+    "verificado": false
+  }
+}

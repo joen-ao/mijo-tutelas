@@ -1,0 +1,19 @@
+{
+  "generado": "2026-08-15T21:58:58.212Z",
+  "fuente": "HuggingFace · Manuel/sentencias-corte-cons-colombia-1992-2021 (CC-BY-4.0)",
+  "sentenciasLeidas": 23750,
+  "sentenciasSalud": 6888,
+  "chunks": 20481,
+  "conEmbedding": 6888,
+  "modeloEmbedding": "gemini-embedding-001 (768d, int8)",
+  "porResultado": {
+    "concedida": 5188,
+    "negada": 391,
+    "indeterminada": 1309
+  },
+  "umbrales": {
+    "minFuertes": 2,
+    "minSalud": 5,
+    "maxChunks": 3
+  }
+}

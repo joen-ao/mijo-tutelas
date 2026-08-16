@@ -1,0 +1,192 @@
+/**
+ * Hoja de estilo del derecho de petición.
+ *
+ * Hermana de tutela.css y por el mismo motivo: se maqueta para el PAPEL, se abre
+ * con Chromium headless y sale por page.pdf({format:'Letter'}). Las medidas van
+ * en centímetros y puntos, que es como se especifica un escrito, no en rem.
+ *
+ * Es un archivo aparte y no un `import` de tutela.css a propósito. Los dos
+ * documentos se parecen hoy, pero uno se dirige a un juez y el otro a una
+ * empresa, y cuando cambie el de la tutela no debe moverse el de la petición.
+ * Duplicar 60 líneas de CSS cuesta menos que desacoplarlas después.
+ *
+ * Fuentes del sistema, sin cargar nada: una tipografía que no llega a tiempo
+ * dejaría el PDF en sans-serif, y un escrito formal espera serifa.
+ */
+
+@page {
+  size: Letter;
+  /* Márgenes de oficio: el izquierdo más ancho porque ahí se perfora y cose. */
+  margin: 2.5cm 2.5cm 2.5cm 3cm;
+}
+
+/* El layout global pinta el body con el gris de la app. Con printBackground
+ * activado ese gris sale impreso alrededor del documento y en las hojas que no
+ * se llenan del todo. Aquí el papel es blanco y punto. Solo afecta a /peticion:
+ * esta hoja únicamente se carga en esa ruta. */
+html,
+body {
+  background: #fff;
+}
+
+.peticion {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 12pt;
+  line-height: 1.55;
+  color: #000;
+  background: #fff;
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* En pantalla se ve como una hoja; al imprimir, el papel ya es la hoja. */
+.peticion__doc {
+  max-width: 17cm;
+  margin: 0 auto;
+  padding: 2cm 1cm;
+  background: #fff;
+}
+
+.peticion__instrucciones {
+  break-before: page;
+  page-break-before: always;
+}
+
+@media print {
+  .peticion__doc { max-width: none; margin: 0; padding: 0; }
+}
+
+/* ── Encabezado ───────────────────────────────────────────────────────── */
+
+.peticion__enc {
+  margin-bottom: 1.4em;
+  text-align: left;
+}
+
+.peticion__enc p { margin: 0 0 1em; }
+
+/* La fecha va ARRIBA y a la derecha, no al pie como en la tutela: es una carta
+ * dirigida a una empresa, y así es como se fecha una carta. Además importa que
+ * se vea de una: el término se cuenta desde la radicación. */
+.peticion__lugar-fecha {
+  text-align: right;
+  margin-bottom: 1.6em !important;
+}
+
+.peticion__ref {
+  margin-left: 8.5cm;
+  text-align: left;
+  line-height: 1.35;
+}
+
+.peticion__intro { margin: 1.6em 0; text-indent: 1.2cm; }
+
+/* ── Secciones ────────────────────────────────────────────────────────── */
+
+.peticion h2 {
+  font-size: 12pt;
+  font-weight: bold;
+  text-align: left;
+  margin: 1.7em 0 0.7em;
+  letter-spacing: 0.02em;
+  /* Un título no debe quedar solo al final de la página. */
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+.peticion p { margin: 0 0 0.9em; }
+
+.peticion ol, .peticion ul { margin: 0 0 1em; padding-left: 1.2cm; }
+.peticion li { margin-bottom: 0.65em; }
+
+.peticion__hechos { list-style: decimal; }
+.peticion__peticiones { list-style: decimal; }
+.peticion__anexos { list-style: decimal; }
+
+.peticion__fecha { color: #333; }
+
+/* El párrafo del término es el que hace que esto se responda. Va enmarcado para
+ * que quien lo reciba en la ventanilla no pueda pasarlo por alto, y entero en
+ * una sola página: partido a la mitad pierde justo el efecto que busca. */
+.peticion__termino {
+  margin: 1.1em 0;
+  padding: 0.7em 0.9em;
+  border: 1pt solid #444;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Los renglones en blanco para rellenar a mano no se justifican: al estirar la
+ * línea quedan huecos absurdos entre las palabras. */
+.peticion__notif {
+  text-align: left;
+  line-height: 1.8;
+}
+
+/* ── Firma ────────────────────────────────────────────────────────────── */
+
+.peticion__cierre { margin-top: 2em; }
+
+.peticion__firma {
+  margin-top: 2.4em;
+  text-align: left;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.peticion__firma-linea {
+  border-bottom: 1pt solid #000;
+  width: 8cm;
+  margin: 0 0 0.4em;
+}
+
+/* ── Hoja 2: instructivo ──────────────────────────────────────────────── */
+
+/* Tiene que caber en UNA hoja: es lo que la persona va a mirar mientras hace la
+ * fila en la EPS, y partido en dos deja de servir para eso. De ahí que vaya más
+ * apretado que el escrito. */
+.peticion__instrucciones {
+  text-align: left;
+  hyphens: none;
+  font-size: 11pt;
+  line-height: 1.4;
+}
+
+.peticion__instrucciones h1 {
+  font-size: 15pt;
+  margin: 0 0 0.8em;
+  padding-bottom: 0.3em;
+  border-bottom: 1.5pt solid #000;
+}
+
+.peticion__instrucciones h3 {
+  font-size: 11.5pt;
+  margin: 1em 0 0.3em;
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+.peticion__instrucciones p { margin-bottom: 0.55em; }
+.peticion__instrucciones li { margin-bottom: 0.25em; }
+
+.peticion__instrucciones ul { list-style: disc; }
+
+.peticion__aviso {
+  margin-top: 1.3em;
+  padding: 0.6em 0.8em;
+  border: 1pt solid #999;
+  font-size: 10.5pt;
+  color: #333;
+  /* Que no se quede solo en una hoja aparte, colgando del instructivo. */
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* ── Documento vencido ────────────────────────────────────────────────── */
+
+.peticion__error {
+  padding: 4cm 2cm;
+  text-align: center;
+  font-size: 13pt;
+  color: #666;
+}

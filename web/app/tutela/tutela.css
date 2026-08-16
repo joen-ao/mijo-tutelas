@@ -1,0 +1,214 @@
+/**
+ * Hoja de estilo del documento judicial.
+ *
+ * Se maqueta para el PAPEL: la página se abre con Chromium headless y sale por
+ * page.pdf({format:'Letter'}). Por eso las medidas van en centímetros y en
+ * puntos —que es como se especifica un escrito judicial— y no en rem.
+ *
+ * Fuentes del sistema, sin cargar nada: una tipografía que no llega a tiempo
+ * dejaría el PDF en sans-serif y un juzgado espera serifa.
+ */
+
+@page {
+  size: Letter;
+  /* Márgenes de oficio: el izquierdo más ancho porque ahí se perfora y cose. */
+  margin: 2.5cm 2.5cm 2.5cm 3cm;
+}
+
+/* El layout global pinta el body con el gris de la app. Con printBackground
+ * activado ese gris sale impreso en el PDF alrededor del documento y en las
+ * hojas que no se llenan del todo. Aquí el papel es blanco y punto. Solo afecta
+ * a /tutela: esta hoja de estilo únicamente se carga en esa ruta. */
+html,
+body {
+  background: #fff;
+}
+
+.tutela {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 12pt;
+  line-height: 1.55;
+  color: #000;
+  background: #fff;
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* En pantalla se ve como una hoja; al imprimir, el papel ya es la hoja. */
+.tutela__doc {
+  max-width: 17cm;
+  margin: 0 auto;
+  padding: 2cm 1cm;
+  background: #fff;
+}
+
+.tutela__instrucciones {
+  break-before: page;
+  page-break-before: always;
+}
+
+@media print {
+  .tutela__doc { max-width: none; margin: 0; padding: 0; }
+}
+
+/* ── Encabezado ───────────────────────────────────────────────────────── */
+
+.tutela__enc {
+  margin-bottom: 1.4em;
+  text-align: left;
+}
+
+.tutela__enc p { margin: 0 0 1em; }
+
+.tutela__ref {
+  margin-left: 8.5cm;
+  text-align: left;
+  line-height: 1.35;
+}
+
+.tutela__intro { margin: 1.6em 0; text-indent: 1.2cm; }
+
+/* ── Secciones ────────────────────────────────────────────────────────── */
+
+.tutela h2 {
+  font-size: 12pt;
+  font-weight: bold;
+  text-align: left;
+  margin: 1.7em 0 0.7em;
+  letter-spacing: 0.02em;
+  /* Un título no debe quedar solo al final de la página. */
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+.tutela p { margin: 0 0 0.9em; }
+
+.tutela ol, .tutela ul { margin: 0 0 1em; padding-left: 1.2cm; }
+.tutela li { margin-bottom: 0.65em; }
+
+.tutela__hechos { list-style: decimal; }
+.tutela__pretensiones { list-style: upper-latin; }
+.tutela__anexos { list-style: decimal; }
+
+.tutela__fecha { color: #333; }
+
+/* Los renglones en blanco para rellenar a mano no se justifican: al estirar la
+ * línea quedan huecos absurdos entre las palabras del nombre. */
+.tutela__notif {
+  text-align: left;
+  line-height: 1.8;
+}
+
+/* ── Citas verificadas ────────────────────────────────────────────────── */
+
+/* Un fundamento con sus citas mide media página, así que NO se le pone
+ * break-inside: avoid — hacía que cada uno saltara entero a la hoja siguiente y
+ * dejaba media página en blanco cada vez (7 hojas para lo que cabe en 4). Lo
+ * que sí tiene que quedar entero es cada CITA: una frase de la Corte partida
+ * entre dos páginas se lee como dos frases distintas. */
+.tutela__fundamento {
+  margin-bottom: 1.2em;
+}
+
+.tutela__cita {
+  margin: 0.8em 0 1em 1.2cm;
+  padding-left: 0.6cm;
+  border-left: 2pt solid #444;
+  font-size: 11pt;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.tutela__cita-frase { font-style: italic; margin-bottom: 0.35em; }
+
+.tutela__cita-pie {
+  font-size: 9.5pt;
+  font-style: normal;
+  color: #333;
+  text-align: left;
+  margin: 0;
+}
+
+/* El sello es discreto a propósito: informa al juez sin parecer publicidad. */
+.tutela__sello {
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+  color: #1a5c2e;
+}
+
+.tutela__fuente {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 8.5pt;
+  color: #555;
+  word-break: break-all;
+}
+
+/* ── Firma ────────────────────────────────────────────────────────────── */
+
+.tutela__cierre { margin-top: 2em; }
+
+.tutela__firma {
+  margin-top: 2.4em;
+  text-align: left;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.tutela__firma-linea {
+  border-bottom: 1pt solid #000;
+  width: 8cm;
+  margin: 0 0 0.4em;
+}
+
+.tutela__lugar { margin-top: 1.4em; }
+
+/* ── Hoja 2: instructivo ──────────────────────────────────────────────── */
+
+/* El instructivo tiene que caber en UNA hoja. Es lo que la persona va a mirar
+ * mientras hace la fila en el juzgado, y partido en dos deja de servir para
+ * eso; de ahí que vaya más apretado que el escrito judicial. */
+.tutela__instrucciones {
+  text-align: left;
+  hyphens: none;
+  font-size: 11pt;
+  line-height: 1.4;
+}
+
+.tutela__instrucciones h1 {
+  font-size: 15pt;
+  margin: 0 0 0.8em;
+  padding-bottom: 0.3em;
+  border-bottom: 1.5pt solid #000;
+}
+
+.tutela__instrucciones h3 {
+  font-size: 11.5pt;
+  margin: 1em 0 0.3em;
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+.tutela__instrucciones p { margin-bottom: 0.55em; }
+.tutela__instrucciones li { margin-bottom: 0.25em; }
+
+.tutela__instrucciones ul { list-style: disc; }
+
+.tutela__aviso {
+  margin-top: 1.3em;
+  padding: 0.6em 0.8em;
+  border: 1pt solid #999;
+  font-size: 10.5pt;
+  color: #333;
+  /* Que no se quede solo en una hoja aparte, colgando del instructivo. */
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* ── Expediente vencido ───────────────────────────────────────────────── */
+
+.tutela__error {
+  padding: 4cm 2cm;
+  text-align: center;
+  font-size: 13pt;
+  color: #666;
+}

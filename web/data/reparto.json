@@ -1,0 +1,70 @@
+{
+  "_fuente": {
+    "verificados": "Listado de correos institucionales de las Oficinas Judiciales — CENDOJ, Rama Judicial. https://www.ramajudicial.gov.co/documents/2302615/32812435/C-17+Anexo++4+_Correos+Oficinas+Judiciales+Direcciones+Seccionales(1)%20(1)%20(1).pdf",
+    "consultado": "2026-08-16",
+    "_nota_verificado": "verificado=true SOLO si el correo aparece EN ESE listado oficial, transcrito tal cual (incluida la mayúscula de Bucaramanga). verificado=false = la dirección se observó en radicaciones reales publicadas, pero NO está en el listado oficial del CENDOJ: hay que confirmarla antes de radicar en producción. lib/correo.ts loguea una advertencia al usar cualquiera marcada en false.",
+    "_nota_bogota_barranquilla": "El listado oficial trae para Bogotá solo la Oficina de Depósitos Judiciales y para Barranquilla solo la de Títulos. Ninguna de las dos es la de reparto, así que NO se usaron. Las direcciones de abajo salen de tutelas radicadas y publicadas, y quedan en false a propósito.",
+    "_alternativa_siempre_valida": "https://procesojudicial.ramajudicial.gov.co/TutelaEnLinea — el portal oficial funciona para todo el país y no depende de este mapa."
+  },
+
+  "bogota": {
+    "ciudad": "Bogotá D.C.",
+    "oficina": "Oficina Judicial de Reparto de Bogotá",
+    "correo": "apptutelasbta@cendoj.ramajudicial.gov.co",
+    "verificado": false
+  },
+  "medellin": {
+    "ciudad": "Medellín",
+    "oficina": "Oficina Judicial - Seccional Medellín",
+    "correo": "ofjudmed@cendoj.ramajudicial.gov.co",
+    "verificado": true
+  },
+  "cali": {
+    "ciudad": "Cali",
+    "oficina": "Oficina Judicial - Seccional Cali",
+    "correo": "ofjudicialcali@cendoj.ramajudicial.gov.co",
+    "verificado": true
+  },
+  "barranquilla": {
+    "ciudad": "Barranquilla",
+    "oficina": "Oficina Judicial de Reparto de Barranquilla",
+    "correo": "apptutelasbquilla@cendoj.ramajudicial.gov.co",
+    "verificado": false
+  },
+  "cartagena": {
+    "ciudad": "Cartagena",
+    "oficina": "Oficina Judicial - Seccional Cartagena",
+    "correo": "ofijudicialcgena@cendoj.ramajudicial.gov.co",
+    "verificado": true
+  },
+  "bucaramanga": {
+    "ciudad": "Bucaramanga",
+    "oficina": "Oficina Judicial - Seccional Bucaramanga",
+    "correo": "Ofjudsbuc@cendoj.ramajudicial.gov.co",
+    "verificado": true
+  },
+  "pereira": {
+    "ciudad": "Pereira",
+    "oficina": "Oficina Judicial - Seccional Pereira",
+    "correo": "ofjudper@cendoj.ramajudicial.gov.co",
+    "verificado": true
+  },
+  "manizales": {
+    "ciudad": "Manizales",
+    "oficina": "Oficina Judicial - Seccional Manizales",
+    "correo": "ofjudmzales@cendoj.ramajudicial.gov.co",
+    "verificado": true
+  },
+  "cucuta": {
+    "ciudad": "Cúcuta",
+    "oficina": "Oficina Judicial - Seccional Cúcuta",
+    "correo": "ofjudcuc@cendoj.ramajudicial.gov.co",
+    "verificado": true
+  },
+  "ibague": {
+    "ciudad": "Ibagué",
+    "oficina": "Oficina Judicial - Seccional Ibagué",
+    "correo": "ofjudibague@cendoj.ramajudicial.gov.co",
+    "verificado": true
+  }
+}

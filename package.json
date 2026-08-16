@@ -1,0 +1,15 @@
+{
+  "name": "mijo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Mijo — convierte el relato de una persona en una acción de tutela de salud lista para radicar, con jurisprudencia verificada.",
+  "scripts": {
+    "indexar": "node scripts/indexar-sentencias.mjs",
+    "eval": "node eval/correr.mjs",
+    "supabase": "node scripts/activar-supabase.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

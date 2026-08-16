@@ -1,0 +1,121 @@
+{
+  "_comentario": [
+    "50 relatos etiquetados a mano para medir dos cosas distintas:",
+    "",
+    "  1. El CLASIFICADOR: ¿acierta el derecho vulnerado y si el caso es tutelable?",
+    "     Esto se compara contra 'esperado', que lo llena el equipo a mano.",
+    "  2. El VERIFICADOR: ¿cuántas citas propone el modelo y cuántas rechaza el",
+    "     código? Esta métrica NO necesita etiqueta humana: el corpus es la",
+    "     verdad. Por eso corre sobre los 50 casos aunque 'esperado' esté vacío.",
+    "",
+    "COMO LLENARLOS: escribe el relato como lo diría la persona por WhatsApp,",
+    "con desorden, sin fechas exactas y con faltas de ortografía si aplica. Los",
+    "relatos demasiado limpios inflan la exactitud y no se parecen a la realidad.",
+    "",
+    "Incluir a propósito casos DIFICILES y casos FUERA DE ALCANCE (pensiones,",
+    "arriendo, laboral): si el clasificador no sabe decir 'esto no es lo mío',",
+    "el producto arma tutelas que no sirven.",
+    "",
+    "Campos de 'esperado':",
+    "  derecho_fundamental: salud | vida | vida digna | seguridad social |",
+    "                       integridad personal | mínimo vital | diagnóstico",
+    "  es_tutelable:        true si es una negativa de servicio de salud",
+    "  requiere_medida_provisional: true si hay riesgo de daño irreparable",
+    "",
+    "Correr:  node eval/correr.mjs            (los 50)",
+    "         node eval/correr.mjs --limite 5 (prueba rápida)"
+  ],
+
+  "casos": [
+    {
+      "id": 1,
+      "relato": "Buenas tardes, mi EPS Sanitas me negó la quimioterapia que me ordenó el oncólogo. Tengo cáncer de seno y llevo mes y medio esperando la autorización. Me dicen que el medicamento no está en el plan.",
+      "esperado": {
+        "derecho_fundamental": "salud",
+        "es_tutelable": true,
+        "requiere_medida_provisional": true
+      }
+    },
+    {
+      "id": 2,
+      "relato": "mi mamá tiene 78 años y le mandaron unos pañales desechables porque ya no controla esfínteres, la nueva eps dice que eso no lo cubren que eso lo tiene que comprar uno. ella no tiene con qué y yo tampoco",
+      "esperado": {
+        "derecho_fundamental": "salud",
+        "es_tutelable": true,
+        "requiere_medida_provisional": false
+      }
+    },
+    {
+      "id": 3,
+      "relato": "Llevo desde enero pidiendo cita con neurología en Compensar. Me mandan de una sede a otra, me dicen que no hay agenda, que llame la otra semana. Ya van cuatro meses y las convulsiones siguen.",
+      "esperado": {
+        "derecho_fundamental": "salud",
+        "es_tutelable": true,
+        "requiere_medida_provisional": false
+      }
+    },
+    {
+      "id": 4,
+      "relato": "Me operaron de la rodilla y el fisiatra me mandó 20 terapias. Salud Total me autorizó 5 y me dijo que hasta ahí. Sin las terapias completas la rodilla no me va a servir, ya me lo dijo el médico.",
+      "esperado": {
+        "derecho_fundamental": "salud",
+        "es_tutelable": true,
+        "requiere_medida_provisional": false
+      }
+    },
+    {
+      "id": 5,
+      "relato": "Mi hijo tiene autismo y le ordenaron terapia ABA y fonoaudiología. La EPS Famisanar dice que eso es educativo y no de salud, que no lo cubre. El niño tiene 6 años y no habla.",
+      "esperado": {
+        "derecho_fundamental": "salud",
+        "es_tutelable": true,
+        "requiere_medida_provisional": false
+      }
+    },
+    {
+      "id": 6,
+      "relato": "Hola, quería preguntar si me pueden ayudar con una tutela. Colpensiones me negó la pensión de invalidez, dice que no alcanzo las semanas. Llevo dos años en eso.",
+      "esperado": {
+        "derecho_fundamental": "seguridad social",
+        "es_tutelable": false,
+        "requiere_medida_provisional": false
+      }
+    },
+    {
+      "id": 7,
+      "relato": "El arrendador me quiere sacar del apartamento sin darme plazo, dice que necesita el inmueble. Tengo dos niños pequeños y no tengo para dónde irme.",
+      "esperado": {
+        "derecho_fundamental": "vida digna",
+        "es_tutelable": false,
+        "requiere_medida_provisional": false
+      }
+    },
+    {
+      "id": 8,
+      "relato": "estoy embarazada de 7 meses y la eps no me ha dado ni una ecografía, me dicen que el convenio con el laboratorio se venció. estoy asustada porque el bebé no se mueve igual",
+      "esperado": {
+        "derecho_fundamental": "salud",
+        "es_tutelable": true,
+        "requiere_medida_provisional": true
+      }
+    },
+    {
+      "id": 9,
+      "relato": "Mi papá está hospitalizado hace 3 semanas y ya le dieron salida, pero necesita oxígeno domiciliario y una cama hospitalaria en la casa. La EPS Coosalud dice que eso no lo entrega. Él no puede respirar solo.",
+      "esperado": {
+        "derecho_fundamental": "salud",
+        "es_tutelable": true,
+        "requiere_medida_provisional": true
+      }
+    },
+    {
+      "id": 10,
+      "relato": "me despidieron estando incapacitado, llevaba 4 meses con la incapacidad por la espalda y la empresa me sacó igual",
+      "esperado": {
+        "derecho_fundamental": "vida digna",
+        "es_tutelable": false,
+        "requiere_medida_provisional": false
+      }
+    }
+  ]
+}
